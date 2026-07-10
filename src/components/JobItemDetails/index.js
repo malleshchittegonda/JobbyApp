@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'
 import {Redirect} from 'react-router-dom'
 import Loader from 'react-loader-spinner'
 import Header from '../Header'
+import './index.css'
 
 const apiStatusConstants = {
   initial: 'INITIAL',
@@ -32,9 +33,8 @@ class JobItemDetails extends Component {
       headers: {Authorization: `Bearer ${jwtToken}`},
     })
 
-    const data = await response.json()
-
     if (response.ok) {
+      const data = await response.json()
       this.setState({
         jobDetails: data.job_details,
         similarJobs: data.similar_jobs,
@@ -46,20 +46,29 @@ class JobItemDetails extends Component {
   }
 
   renderLoader = () => (
-    <div data-testid="loader">
-      <Loader type="ThreeDots" height="50" width="50" />
+    <div className="details-loading-container" data-testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
     </div>
   )
 
   renderFailure = () => (
-    <div>
+    <div className="details-failure-container">
       <img
         src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
         alt="failure view"
+        className="details-error-illustration"
       />
-      <h1>Oops! Something Went Wrong</h1>
-      <p>We cannot seem to find the page you are looking for</p>
-      <button onClick={this.getDetails}>Retry</button>
+      <h1 className="details-error-heading">Oops! Something Went Wrong</h1>
+      <p className="details-error-desc">
+        We cannot seem to find the page you are looking for
+      </p>
+      <button
+        type="button"
+        className="details-retry-button"
+        onClick={this.getDetails}
+      >
+        Retry
+      </button>
     </div>
   )
 
@@ -67,53 +76,101 @@ class JobItemDetails extends Component {
     const {jobDetails, similarJobs} = this.state
 
     return (
-      <div>
-        <img src={jobDetails.company_logo_url} alt="job details company logo" />
-        <h1>{jobDetails.title}</h1>
-        <p>{jobDetails.rating}</p>
-        <p>{jobDetails.location}</p>
-        <p>{jobDetails.employment_type}</p>
-        <p>{jobDetails.package_per_annum}</p>
+      <div className="job-item-details-route-container">
+        <div className="detailed-job-card">
+          <div className="job-card-header">
+            <img
+              src={jobDetails.company_logo_url}
+              alt="job details company logo"
+              className="detailed-company-logo"
+            />
+            <div className="job-title-rating-container">
+              <h1 className="detailed-job-title">{jobDetails.title}</h1>
+              <div className="rating-block">
+                <p>{jobDetails.rating}</p>
+              </div>
+            </div>
+          </div>
 
-        <h1>Description</h1>
-        <p>{jobDetails.job_description}</p>
+          <div className="job-meta-row">
+            <div className="meta-left-group">
+              <p className="meta-item">{jobDetails.location}</p>
+              <p className="meta-item">{jobDetails.employment_type}</p>
+            </div>
+            <p className="package-text">{jobDetails.package_per_annum}</p>
+          </div>
 
-        <a href={jobDetails.company_website_url}>Visit</a>
+          <hr className="horizontal-rule" />
 
-        <h1>Skills</h1>
-        <ul>
-          {jobDetails.skills &&
-            jobDetails.skills.map(skill => (
-              <li key={skill.name}>
-                <img src={skill.image_url} alt={skill.name} />
-                <p>{skill.name}</p>
-              </li>
-            ))}
-        </ul>
+          <div className="section-header-row">
+            <h1 className="detail-section-heading">Description</h1>
+            <a
+              href={jobDetails.company_website_url}
+              target="_blank"
+              rel="noreferrer"
+              className="company-visit-link"
+            >
+              Visit
+            </a>
+          </div>
+          <p className="detailed-description-text">
+            {jobDetails.job_description}
+          </p>
 
-        <h1>Life at Company</h1>
-        <h1>Description</h1>
-        <p>
-          {jobDetails.life_at_company && jobDetails.life_at_company.description}
-        </p>
-        {jobDetails.life_at_company && (
-          <img
-            src={jobDetails.life_at_company.image_url}
-            alt="life at company"
-          />
-        )}
+          <h1 className="detail-section-heading">Skills</h1>
+          <ul className="skills-grid-list">
+            {jobDetails.skills &&
+              jobDetails.skills.map(skill => (
+                <li key={skill.name} className="skill-item-card">
+                  <img
+                    src={skill.image_url}
+                    alt={skill.name}
+                    className="skill-img"
+                  />
+                  <p className="skill-name-text">{skill.name}</p>
+                </li>
+              ))}
+          </ul>
 
-        <h1>Similar Jobs</h1>
-        <ul>
+          <h1 className="detail-section-heading">Life at Company</h1>
+          <div className="life-at-company-split-block">
+            <p className="life-at-company-desc">
+              {jobDetails.life_at_company &&
+                jobDetails.life_at_company.description}
+            </p>
+            {jobDetails.life_at_company && (
+              <img
+                src={jobDetails.life_at_company.image_url}
+                alt="life at company"
+                className="life-at-company-graphic"
+              />
+            )}
+          </div>
+        </div>
+
+        <h1 className="similar-jobs-deck-heading">Similar Jobs</h1>
+        <ul className="similar-jobs-flex-grid">
           {similarJobs.map(job => (
-            <li key={job.id}>
-              <img src={job.company_logo_url} alt="similar job company logo" />
-              <h1>{job.title}</h1>
-              <p>{job.rating}</p>
-              <p>{job.location}</p>
-              <p>{job.employment_type}</p>
-              <h1>Description</h1>
-              <p>{job.job_description}</p>
+            <li key={job.id} className="similar-job-card-wrapper">
+              <div className="job-card-header">
+                <img
+                  src={job.company_logo_url}
+                  alt="similar job company logo"
+                  className="detailed-company-logo"
+                />
+                <div className="job-title-rating-container">
+                  <h1 className="detailed-job-title">{job.title}</h1>
+                  <div className="rating-block">
+                    <p>{job.rating}</p>
+                  </div>
+                </div>
+              </div>
+              <h1 className="detail-section-heading">Description</h1>
+              <p className="detailed-description-text">{job.job_description}</p>
+              <div className="meta-left-group">
+                <p className="meta-item">{job.location}</p>
+                <p className="meta-item">{job.employment_type}</p>
+              </div>
             </li>
           ))}
         </ul>

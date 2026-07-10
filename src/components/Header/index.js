@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie'
 import {withRouter, Link} from 'react-router-dom'
+import './index.css'
 
 const Header = props => {
   const onLogout = () => {
@@ -9,23 +10,32 @@ const Header = props => {
   }
 
   return (
-    <nav>
+    <nav className="nav-header">
       <Link to="/">
         <img
           src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
           alt="website logo"
+          className="nav-logo"
         />
       </Link>
 
-      <ul>
+      <ul className="nav-menu">
         <li>
-          <Link to="/">Home</Link>
+          <Link to="/" className="nav-link">
+            Home
+          </Link>
         </li>
         <li>
-          <Link to="/jobs">Jobs</Link>
+          <Link to="/jobs" className="nav-link">
+            Jobs
+          </Link>
         </li>
         <li>
-          <button type="button" onClick={onLogout}>
+          <button
+            type="button"
+            className="logout-desktop-btn"
+            onClick={onLogout}
+          >
             Logout
           </button>
         </li>

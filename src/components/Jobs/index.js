@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
 import {Link} from 'react-router-dom'
 import Header from '../Header'
+import './index.css'
 
 const apiStatus = {
   initial: 'INITIAL',
@@ -52,7 +53,6 @@ class Jobs extends Component {
 
     const types = employmentTypes.join(',')
     const url = `https://apis.ccbp.in/jobs?employment_type=${types}&minimum_package=${salaryRange}&search=${searchInput}`
-
     const jwtToken = Cookies.get('jwt_token')
 
     const response = await fetch(url, {
@@ -88,25 +88,45 @@ class Jobs extends Component {
   }
 
   renderLoader = () => (
-    <div data-testid="loader">
-      <Loader type="ThreeDots" height="50" width="50" />
+    <div className="jobs-central-loader-container" data-testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
     </div>
   )
 
   renderProfile = () => {
     const {profileStatus, profile} = this.state
 
-    if (profileStatus === apiStatus.loading) return this.renderLoader()
+    if (profileStatus === apiStatus.loading) {
+      return (
+        <div className="profile-retry-container">
+          <Loader type="ThreeDots" color="#ffffff" height="40" width="40" />
+        </div>
+      )
+    }
 
     if (profileStatus === apiStatus.failure) {
-      return <button onClick={this.getProfile}>Retry</button>
+      return (
+        <div className="profile-retry-container">
+          <button
+            type="button"
+            className="profile-retry-btn"
+            onClick={this.getProfile}
+          >
+            Retry
+          </button>
+        </div>
+      )
     }
 
     return (
-      <div>
-        <img src={profile.profile_image_url} alt="profile" />
-        <h1>{profile.name}</h1>
-        <p>{profile.short_bio}</p>
+      <div className="profile-card">
+        <img
+          src={profile.profile_image_url}
+          alt="profile"
+          className="profile-img"
+        />
+        <h1 className="profile-name">{profile.name}</h1>
+        <p className="profile-bio">{profile.short_bio}</p>
       </div>
     )
   }
@@ -116,29 +136,53 @@ class Jobs extends Component {
 
     if (jobsList.length === 0) {
       return (
-        <div>
+        <div className="no-jobs-view-container">
           <img
             src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
             alt="no jobs"
+            className="status-illustration-img"
           />
-          <h1>No Jobs Found</h1>
-          <p>We could not find any jobs. Try other filters</p>
+          <h1 className="status-view-heading">No Jobs Found</h1>
+          <p className="status-view-desc">
+            We could not find any jobs. Try other filters
+          </p>
         </div>
       )
     }
 
     return (
-      <ul>
+      <ul className="jobs-deck-list">
         {jobsList.map(job => (
           <li key={job.id}>
-            <Link to={`/jobs/${job.id}`}>
-              <img src={job.company_logo_url} alt="company logo" />
-              <h1>{job.title}</h1>
-              <p>{job.rating}</p>
-              <p>{job.location}</p>
-              <p>{job.employment_type}</p>
-              <h1>Description</h1>
-              <p>{job.job_description}</p>
+            <Link to={`/jobs/${job.id}`} className="job-card-clickable-link">
+              <div className="job-deck-item-card">
+                <div className="job-card-header">
+                  <img
+                    src={job.company_logo_url}
+                    alt="company logo"
+                    className="company-logo-img"
+                  />
+                  <div className="title-rating-stack">
+                    <h1 className="job-title-h1">{job.title}</h1>
+                    <div className="rating-row">
+                      <p>{job.rating}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="meta-stats-row">
+                  <div className="meta-left-block">
+                    <p className="meta-text-item">{job.location}</p>
+                    <p className="meta-text-item">{job.employment_type}</p>
+                  </div>
+                  <p className="salary-text">{job.package_per_annum}</p>
+                </div>
+
+                <hr className="card-inner-divider" />
+
+                <h1 className="card-section-heading">Description</h1>
+                <p className="job-short-desc">{job.job_description}</p>
+              </div>
             </Link>
           </li>
         ))}
@@ -154,14 +198,23 @@ class Jobs extends Component {
         return this.renderLoader()
       case apiStatus.failure:
         return (
-          <div>
+          <div className="jobs-failure-view-container">
             <img
               src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
               alt="failure view"
+              className="status-illustration-img"
             />
-            <h1>Oops! Something Went Wrong</h1>
-            <p>We cannot seem to find the page you are looking for</p>
-            <button onClick={this.getJobs}>Retry</button>
+            <h1 className="status-view-heading">Oops! Something Went Wrong</h1>
+            <p className="status-view-desc">
+              We cannot seem to find the page you are looking for
+            </p>
+            <button
+              type="button"
+              className="jobs-retry-btn"
+              onClick={this.getJobs}
+            >
+              Retry
+            </button>
           </div>
         )
       case apiStatus.success:
@@ -175,56 +228,81 @@ class Jobs extends Component {
     const {employmentTypesList, salaryRangesList} = this.props
 
     return (
-      <>
+      <div className="jobs-route-bg-container">
         <Header />
 
-        {this.renderProfile()}
+        <div className="jobs-content-container">
+          <aside className="jobs-sidebar">
+            {this.renderProfile()}
 
-        <input
-          type="search"
-          value={this.state.searchInput}
-          onChange={this.onChangeSearch}
-        />
+            <hr className="filter-divider" />
 
-        <button
-          type="button"
-          data-testid="searchButton"
-          onClick={this.onSearch}
-        >
-          Search
-        </button>
+            <h1 className="filter-heading">Type of Employment</h1>
+            <ul className="filters-list">
+              {employmentTypesList.map(each => (
+                <li key={each.employmentTypeId} className="filter-item">
+                  <input
+                    id={each.employmentTypeId}
+                    type="checkbox"
+                    className="filter-checkbox"
+                    onChange={() =>
+                      this.onChangeEmployment(each.employmentTypeId)
+                    }
+                  />
+                  <label
+                    htmlFor={each.employmentTypeId}
+                    className="filter-label"
+                  >
+                    {each.label}
+                  </label>
+                </li>
+              ))}
+            </ul>
 
-        <h1>Type of Employment</h1>
-        <ul>
-          {employmentTypesList.map(each => (
-            <li key={each.employmentTypeId}>
+            <hr className="filter-divider" />
+
+            <h1 className="filter-heading">Salary Range</h1>
+            <ul className="filters-list">
+              {salaryRangesList.map(each => (
+                <li key={each.salaryRangeId} className="filter-item">
+                  <input
+                    id={each.salaryRangeId}
+                    type="radio"
+                    name="salary"
+                    className="filter-radio"
+                    onChange={() => this.onChangeSalary(each.salaryRangeId)}
+                  />
+                  <label htmlFor={each.salaryRangeId} className="filter-label">
+                    {each.label}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </aside>
+
+          <main className="jobs-main-content-pane">
+            <div className="search-input-group">
               <input
-                id={each.employmentTypeId}
-                type="checkbox"
-                onChange={() => this.onChangeEmployment(each.employmentTypeId)}
+                type="search"
+                className="search-field"
+                placeholder="Search"
+                value={this.state.searchInput}
+                onChange={this.onChangeSearch}
               />
-              <label htmlFor={each.employmentTypeId}>{each.label}</label>
-            </li>
-          ))}
-        </ul>
+              <button
+                type="button"
+                className="search-btn-icon"
+                data-testid="searchButton"
+                onClick={this.onSearch}
+              >
+                Search
+              </button>
+            </div>
 
-        <h1>Salary Range</h1>
-        <ul>
-          {salaryRangesList.map(each => (
-            <li key={each.salaryRangeId}>
-              <input
-                id={each.salaryRangeId}
-                type="radio"
-                name="salary"
-                onChange={() => this.onChangeSalary(each.salaryRangeId)}
-              />
-              <label htmlFor={each.salaryRangeId}>{each.label}</label>
-            </li>
-          ))}
-        </ul>
-
-        {this.renderJobs()}
-      </>
+            {this.renderJobs()}
+          </main>
+        </div>
+      </div>
     )
   }
 }
